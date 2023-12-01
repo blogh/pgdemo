@@ -1,0 +1,27 @@
+
+-----------------------------------------------------------------
+  pg_upgrade run on Mon Aug 14 12:29:36 2023
+-----------------------------------------------------------------
+
+
+-----------------------------------------------------------------
+  pg_upgrade run on Mon Aug 14 12:33:22 2023
+-----------------------------------------------------------------
+
+
+-----------------------------------------------------------------
+  pg_upgrade run on Mon Aug 14 12:33:46 2023
+-----------------------------------------------------------------
+
+command: "/home/benoit/usr/local/postgres/pgsql-13/bin/pg_ctl" -w -l "pg_upgrade_server.log" -D "/home/benoit/var/lib/postgres/pgsql-upg" -o "-p 50432 -b  -c listen_addresses='' -c unix_socket_permissions=0700 -c unix_socket_directories='/home/benoit/git/me/formation/démos'" start >> "pg_upgrade_server.log" 2>&1
+waiting for server to start....2023-08-14 12:33:46.567 CEST [35202] LOG:  redirecting log output to logging collector process
+2023-08-14 12:33:46.567 CEST [35202] HINT:  Future log output will appear in directory "log".
+ done
+server started
+
+
+command: "/home/benoit/usr/local/postgres/pgsql-13/bin/pg_ctl" -w -D "/home/benoit/var/lib/postgres/pgsql-upg" -o "" -m fast stop >> "pg_upgrade_server.log" 2>&1
+waiting for server to shut down.... done
+server stopped
+
+

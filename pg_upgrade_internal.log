@@ -1,0 +1,39 @@
+
+-----------------------------------------------------------------
+  pg_upgrade run on Mon Aug 14 12:29:36 2023
+-----------------------------------------------------------------
+
+Performing Consistency Checks
+-----------------------------
+Checking cluster versions                                   This utility can only upgrade to PostgreSQL version 13.
+
+-----------------------------------------------------------------
+  pg_upgrade run on Mon Aug 14 12:33:22 2023
+-----------------------------------------------------------------
+
+check for "/home/benoit/usr/local/postgres/pgsql-15/bin/postgres" failed: incorrect version: found "postgres (PostgreSQL) 15.4", expected "postgres (PostgreSQL) 14.9"
+
+-----------------------------------------------------------------
+  pg_upgrade run on Mon Aug 14 12:33:46 2023
+-----------------------------------------------------------------
+
+Performing Consistency Checks
+-----------------------------
+Checking cluster versions                                   ok
+Checking database user is the install user                  ok
+Checking database connection settings                       ok
+Checking for prepared transactions                          ok
+Checking for system-defined composite types in user tables  ok
+Checking for reg* data types in user tables                 ok
+Checking for contrib/isn with bigint-passing mismatch       ok
+Checking for user-defined encoding conversions              ok
+Checking for user-defined postfix operators                 ok
+Checking for incompatible polymorphic functions             fatal
+Your installation contains user-defined objects that refer to internal
+polymorphic functions with arguments of type "anyarray" or "anyelement".
+These user-defined objects must be dropped before upgrading and restored
+afterwards, changing them to refer to the new corresponding functions with
+arguments of type "anycompatiblearray" and "anycompatible".
+A list of the problematic objects is in the file:
+    incompatible_polymorphics.txt
+
