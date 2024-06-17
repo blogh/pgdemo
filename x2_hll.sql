@@ -26,8 +26,8 @@ VACUUM ANALYZE x2.hll_test;
 \prompt PAUSE
 :cls
 
-SELECT hll_set_defaults(11, 5, -1, 1); -- defaut
-SELECT hll_set_defaults(17, 5, -1, 0);
+-- SELECT hll_set_defaults(11, 5, -1, 1); -- defaut
+-- SELECT hll_set_defaults(17, 5, -1, 0);
 DROP TABLE IF EXISTS x2.absences;
 CREATE TABLE x2.absences(
 	"when" date,

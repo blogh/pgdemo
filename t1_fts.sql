@@ -16,6 +16,7 @@ DROP TEXT SEARCH CONFIGURATION myTS;
 CREATE TEXT SEARCH CONFIGURATION  myTS (COPY= FRENCH);
 --
 CREATE EXTENSION IF NOT EXISTS unaccent ;
+\dx+ unaccent
 --
 ALTER TEXT SEARCH CONFIGURATION myTS 
       ALTER MAPPING FOR hword, hword_part, word 
@@ -84,9 +85,13 @@ SELECT id, texte
   FROM fts 
  WHERE texte_vectorise @@ phraseto_tsquery('myTs', 'plein de ble'); 
 
-SELECT id, texte 
-  FROM fts 
- WHERE texte_vectorise @@ plainto_tsquery('myTs', 'le chien dans'); 
+-- Ranking et highlights
+SELECT id,
+       ts_headline('myTS', texte, query) AS texte, 
+       ts_rank_cd(texte_vectorise, query) AS rank
+  FROM fts, to_tsquery('myTs', 'chiens | oiseaux') AS query 
+ WHERE texte_vectorise @@ query
+ ORDER BY rank DESC;
 \prompt PAUSE
 :cls
 

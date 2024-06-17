@@ -35,6 +35,7 @@ EXPLAIN (ANALYZE) SELECT * FROM j4.exp_parcours WHERE i > 100 ORDER BY j DESC;
 \prompt PAUSE 
 -- Index scan pour ramener plusieurs valeurs avec une bitmap
 EXPLAIN (ANALYZE) SELECT * FROM j4.exp_parcours WHERE j between 100 AND 500;
+\prompt PAUSE 
 -- Index scan pour incremental sort
 EXPLAIN (ANALYZE) SELECT * FROM j4.exp_parcours ORDER BY j, t;
 \prompt PAUSE 

@@ -10,7 +10,7 @@ SET search_path TO t1, public;
 :cls
 
 --*** Temp tables  *************************************************************
-SET temp_buffers TO '30MB';
+SET temp_buffers TO '40MB';
 CREATE TEMP TABLE matemptable(i int, t text);
 CREATE INDEX ON matemptable USING btree (i);
 --
@@ -34,3 +34,11 @@ INSERT INTO matemptable SELECT x, 'l ' || x FROM generate_series(1, 500000) AS F
 --
 EXPLAIN (ANALYZE, BUFFERS, settings) SELECT * FROM matemptable;
 \prompt PAUSE
+:cls
+
+-- reconnexion la table a disparu
+\c postgres
+EXPLAIN (ANALYZE, BUFFERS, settings) SELECT * FROM matemptable;
+\prompt PAUSE
+:cls
+
