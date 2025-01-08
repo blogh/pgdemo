@@ -47,7 +47,7 @@ CREATE TABLE reservation
 (
   salle      TEXT,
   professeur TEXT,
-  durant    tstzrange);
+  durant     tstzrange);
 
 CREATE EXTENSION btree_gist ;
 

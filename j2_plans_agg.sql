@@ -9,19 +9,20 @@ DROP INDEX IF EXISTS employes_big_matricule_nom_idx;
 :cls
 
 -- Agg ---------------------------------------------------------------------
--- aggregate
+-- aggregate: aggregation simple
 EXPLAIN SELECT count(*) FROM employes;
 \prompt PAUSE
 :cls
--- hash aggregate
+-- hash aggregate: données tiennent en mémoire
 EXPLAIN SELECT fonction, count(*) FROM employes GROUP BY fonction;
 \prompt PAUSE
 :cls
 -- group aggregate (données pré triées)
+SET enable_hashagg TO off;
 EXPLAIN SELECT fonction, count(*) FROM employes GROUP BY matricule;
 \prompt PAUSE
 :cls
--- mixed aggregate
+-- mixed aggregate: GROUP BY CUBE
 EXPLAIN (ANALYZE,BUFFERS)
   SELECT manager, fonction, num_service, COUNT(*)
   FROM employes_big

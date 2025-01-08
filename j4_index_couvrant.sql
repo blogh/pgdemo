@@ -25,7 +25,7 @@ WHERE schemaname = 'j4'
 \prompt PAUSE
 :cls
 -- *** Acces index only **************************************
--- index scan vs index onky scan
+-- index scan vs index only scan
 EXPLAIN (ANALYZE, BUFFERS) SELECT id FROM (SELECT generate_series(1, 500)) AS F(x) INNER JOIN j4.index_couvrants ON x = id;
 --
 EXPLAIN (ANALYZE, BUFFERS) SELECT id, nom FROM (SELECT generate_series(1, 500)) AS F(x) INNER JOIN j4.index_couvrants ON x = id;

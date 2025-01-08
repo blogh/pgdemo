@@ -15,11 +15,12 @@ CREATE SCHEMA s1;
 CREATE SCHEMA s2;
 
 -- search path par défaut
+\dn
+SHOW search_path;
+\prompt PAUSE
+
 CREATE TABLE t1 (id integer);
 \d
-\prompt PAUSE
-SHOW search_path;
-\dn
 \prompt PAUSE
 :cls
 

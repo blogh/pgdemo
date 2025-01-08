@@ -309,7 +309,7 @@ pgbackrest --stanza=main info
 
 # Sync rep
 
-On p2:
+On p3:
 
 ```bash
 pg_createcluster 17 main

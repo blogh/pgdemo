@@ -33,7 +33,7 @@ SELECT matricule, nom, prenom, nom_service, fonction, localisation
   FROM employes_big emp
        JOIN services_big ser ON (emp.num_service = ser.num_service)
  WHERE  ser.localisation = 'Nantes';
--- merge
+-- merge (reduction de la mémoire)
 SET work_mem TO '64kB';
 EXPLAIN (SETTINGS)
 SELECT matricule, nom, prenom, nom_service, fonction, localisation
@@ -42,7 +42,7 @@ SELECT matricule, nom, prenom, nom_service, fonction, localisation
  WHERE  ser.localisation = 'Nantes';
 --
 RESET work_mem;
--- merge
+-- merge (ajout d'un tri)
 EXPLAIN (SETTINGS)
 SELECT matricule, nom, prenom, nom_service, fonction, localisation
   FROM employes_big emp
@@ -61,7 +61,7 @@ EXPLAIN (SETTINGS)
                 FROM employes_big e
                 WHERE e.date_embauche>s.date_creation
                   AND s.num_service = e.num_service) ;
--- hash join
+-- hash join: plus de mémoire
 SET work_mem TO '15MB';
 EXPLAIN (SETTINGS)
   SELECT *
@@ -71,11 +71,12 @@ EXPLAIN (SETTINGS)
                 WHERE e.date_embauche>s.date_creation
                   AND s.num_service = e.num_service) ;
 \prompt PAUSE
+RESET work_mem;
 :cls
 
 
 -- anti-join ---------------------------------------------------------
--- right anti join a partir de la 16
+-- right anti join a partir de la 16 (not exists)
 EXPLAIN (SETTINGS)
   SELECT *
   FROM services s
@@ -95,7 +96,7 @@ CREATE TABLE bar(id serial, foo_a int, b int);
 INSERT INTO foo(a) SELECT i*2 FROM generate_series(1,1000000) i;
 INSERT INTO bar(foo_a, b) SELECT i*2, i%7 FROM generate_series(1,100) i;
 VACUUM ANALYZE foo, bar;
---
+-- // seq scan
 EXPLAIN (ANALYZE, VERBOSE, COSTS OFF, SETTINGS)
 SELECT foo.a, bar.b 
   FROM foo 
@@ -106,14 +107,14 @@ SELECT foo.a, bar.b
 -- Ajout de lignes dans bar
 INSERT INTO bar(foo_a, b) SELECT i*2, i%7 FROM generate_series(1,300000) i;
 VACUUM ANALYZE bar;
---
+-- // hash join
 EXPLAIN (ANALYZE, VERBOSE, COSTS OFF, SETTINGS)
 SELECT foo.a, bar.b 
   FROM foo 
        JOIN bar ON (foo.a = bar.foo_a)
  WHERE a % 3 = 0;
 \prompt PAUSE
---
+-- reduction du nombre de batchs
 SET work_mem TO '15MB'; -- ou hash_mem_multilier
 EXPLAIN (ANALYZE, VERBOSE, COSTS OFF, SETTINGS)
 SELECT foo.a, bar.b 
