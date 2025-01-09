@@ -1,19 +1,28 @@
 ```bash
-PATRONI_CLUSTER_NAME='cluster-test-01'
-PATRONI1_NAME='pg1'
-PATRONI2_NAME='pg2'
-PATRONI3_NAME='pg3'
-PATRONI1_IP='10.0.3.201'
-PATRONI2_IP='10.0.3.202'
-PATRONI3_IP='10.0.3.203'
-ETCD1_IP='10.0.3.101'
-ETCD2_IP='10.0.3.102'
-ETCD3_IP='10.0.3.103'
+sudo cp /etc/postgresql/17/main/start.conf /etc/postgresql/17/main/start.conf.save
+echo disabled | sudo tee /etc/postgresql/17/main/start.conf
+sudo systemctl stop postgresql@17-main
+
+sudo apt-get install patroni
+sudo chown postgres: /etc/patroni
+
+PATRONI_CLUSTER_NAME='acme'
+sudo install -o postgres -g postgres -m 0750 -d /var/log/patroni/${PATRONI_CLUSTER_NAME}
+PATRONI1_NAME='p1'
+PATRONI2_NAME='p2'
+PATRONI3_NAME='p3'
+PATRONI1_IP='10.0.0.21' # p1
+PATRONI2_IP='10.0.0.22' # p2
+PATRONI3_IP='10.0.0.23' # p3
+ETCD1_IP='10.0.0.11'    # e1
+ETCD2_IP='10.0.0.12'    # e2
+ETCD3_IP='10.0.0.13'    # e3
 ETCD_USER='patroni'
 ETCD_PASSWORD='patroni'
-PGDATA="/var/lib/postgresql/15/${PATRONI_CLUSTER_NAME}"
+PGVERSION=17
+PGDATA="/var/lib/postgresql/${PGVERSION}/${PATRONI_CLUSTER_NAME}"
 PGPORT='5432'
-PGBIN='/usr/lib/postgresql/15/bin'
+PGBIN="/usr/lib/postgresql/${PGVERSION}/bin"
 
 PATRONICTL_CONFIG_FILE="/etc/patroni/config.yml"
 PATRONI_SCOPE="${PATRONI_CLUSTER_NAME}"
@@ -21,9 +30,7 @@ PATRONI_SCOPE="${PATRONI_CLUSTER_NAME}"
 PATRONI_NAME="$(hostname)"
 PATRONI_IP="$(hostname -I | sed -e 's/\s*$//')"
 
-chown -R  postgres: /etc/patroni/
-
-cat >"$PATRONICTL_CONFIG_FILE" <<_CONFIGURATION_PATRONI_
+cat >"$PATRONICTL_CONFIG_FILE" << _CONFIGURATION_PATRONI_
 scope: ${PATRONI_CLUSTER_NAME}
 namespace: /service/  # valeur par défaut
 name: ${PATRONI_NAME}
@@ -49,6 +56,7 @@ bootstrap:
     retry_timeout: 10
     maximum_lag_on_failover: 1048576
     postgresql:
+      data_dir: ${PGDATA}
       use_pg_rewind: true
       use_slots: true
       parameters:
@@ -56,18 +64,14 @@ bootstrap:
         hot_standby: on
         max_wal_senders: 10
         max_replication_slots: 5
+        unix_socket_directories: '/tmp'
+      pg_hba:
+      - local all all trust
+      - host all all all trust
+      - host replication replicator all scram-sha-256
   initdb:
   - encoding: UTF8
   - data-checksums
-  pg_hba:
-  - host all all all scram-sha-256
-  - host replication replicator all scram-sha-256
-  users:
-    dba:
-      password: dba_password
-      options:
-      - createrole
-      - createdb
 postgresql:
   listen: "*:${PGPORT}"
   connect_address: ${PATRONI_IP}:${PGPORT}
@@ -83,8 +87,7 @@ postgresql:
     rewind:
       username: rewinder
       password: rewinder_password
-  parameters:
-    unix_socket_directories: '.'
+# parameters:
   basebackup:
     max-rate: "100M"
     checkpoint: "fast"
@@ -99,9 +102,6 @@ tags:
   nosync: false
 _CONFIGURATION_PATRONI_
 
-sudo install -o postgres -g postgres -m 0750 -d /var/log/patroni/${PATRONI_CLUSTER_NAME}
-sudo pg_dropcluster 15 main --stop
-
 patroni --validate-config /etc/patroni/config.yml
 
 sudo systemctl enable --now patroni
@@ -110,12 +110,12 @@ sudo systemctl status patroni
 cat <<_EOF_ > ~postgres/.bashrc
 ## Patroni stuff goes here
 export PATRONICTL_CONFIG_FILE="$PATRONICTL_CONFIG_FILE"
-export PATRONI_SCOPE="${PATRONI_SCOPE}"
+export PATRONI_SCOPE="$PATRONI_SCOPE"
 
 ## PostgreSQL
-export PGDATA="/var/lib/postgresql/15/${PATRONI_SCOPE}"
-export PGHOST=\$PGDATA
-export PGPORT=5432
+export PGDATA="$PGDATA"
+export PGHOST="/tmp"
+export PGPORT=$PGPORT
 
 _EOF_
 
@@ -128,7 +128,5 @@ if [ "$BASH" ]; then
   fi
 fi
 _EOF_
-
-chown postgres: ~postgres/.bashrc ~postgres/.profile
 
 ```
