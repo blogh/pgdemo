@@ -126,7 +126,7 @@ SUBSYSTEM=="misc", KERNEL=="watchdog", ACTION=="add", RUN+="/bin/chown postgres 
 EOF
 ```
 
-## check and start
+## Check and start
 
 ```bash
 # Validate conf
@@ -378,7 +378,7 @@ Update the yaml on all nodes:
 bootstrap:
   method: pgbackrest
   pgbackrest:
-    command: /bin/bash -c "pgbackrest --stanza=test restore"
+    command: /bin/bash -c "pgbackrest --stanza=main restore"
     keep_existing_recovery_conf: True
     no_params: True
   #...
@@ -423,8 +423,8 @@ rm /var/log/pgbackrest/*
 On all nodes:
 
 ```bash
-sudo systemctl start patroni
-ps -fu postgres | grep pgbackrest
+sudo systemctl start patron
+watch ps -fu postgres | grep pgbackrest
 patronictl list acme
 ```
 
